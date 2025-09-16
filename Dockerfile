@@ -1,32 +1,23 @@
-# Use full Debian slim variant with Python 3.12
-FROM python:3.12-slim-bullseye
+# Use official Python base image
+FROM python:3.12-slim
 
+# Set working directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    libffi-dev \
-    libssl-dev \
-    python3-dev \
-    git \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Upgrade pip
-RUN python -m pip install --upgrade pip
-
-# Copy requirements
+# Copy requirements first to leverage Docker cache
 COPY requirements.txt .
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy app code
-COPY app.py .
+# Copy the rest of the app
+COPY . .
 
-# Expose port
+# Set environment variables (optional defaults, can override when running)
+ENV PORT=5000
+
+# Expose the port
 EXPOSE 5000
 
-# Run Flask
+# Run the Flask app
 CMD ["python", "app.py"]
