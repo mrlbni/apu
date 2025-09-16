@@ -1,16 +1,24 @@
 # Use Python 3.12 slim
 FROM python:3.12-slim
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1
-
 # Set workdir
 WORKDIR /app
+
+# Install system dependencies for pyrogram/tgcrypto
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        libffi-dev \
+        libssl-dev \
+        python3-dev \
+        git \
+        curl \
+        && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements
 COPY requirements.txt .
 
-# Install dependencies
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy app
